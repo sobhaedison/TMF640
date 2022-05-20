@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: activation-service
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost:3306/activation_service?createDatabaseIfNotExist=true
+    username: root
+    password:
+    driver-class-name: com.mysql.jdbc.Driver
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8080/eureka/
+server:
+  port: 8085
+  servlet:
+    context-path: /api
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      shared:
+        register-health-indicator: true
+        sliding-window-type: count_based
+        sliding-window-size: 5
+        failure-rate-threshold: 40
+        slow-call-rate-threshold: 40
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 10s
+        slow-call-duration-threshold: 2s
+        writable-stack-trace-enabled: true
+      default:
+        base-config: shared
+  retry:
+      instances:
+        activationService:
+          maxRetryAttempts: 5
+          waitDuration: 10000
+          enableExponentialBackOff: true
+          exponentialBackOffMultiplier: 2
+          retryExceptions:
+            - java.net.ConnectException
+            - org.springframework.web.client.HttpServerErrorException
+            - java.io.IOException
+            - org.springframework.web.client.ResourceAccessException
+        getActivationService:
+          maxRetryAttempts: 5
+          waitDuration: 10000
+          enableExponentialBackOff: true
+          exponentialBackOffMultiplier: 2
+          retryExceptions:
+            - java.net.ConnectException
+            - org.springframework.web.client.HttpServerErrorException
+            - java.io.IOException
+            - org.springframework.web.client.ResourceAccessException
+        updateActivationService:
+          maxRetryAttempts: 5
+          waitDuration: 10000
+          enableExponentialBackOff: true
+          exponentialBackOffMultiplier: 2
+          retryExceptions:
+            - java.net.ConnectException
+            - org.springframework.web.client.HttpServerErrorException
+            - java.io.IOException
+            - org.springframework.web.client.ResourceAccessException
+
+#resilience4j:
+#  retry:
+#    instances:
+#      activationService:
+#        maxRetryAttempts: 3
+#        waitDuration: 2s
+#        retryExceptions:
+#          - java.lang.Exception
+#          - java.net.ConnectException
+#          - org.springframework.web.client.HttpServerErrorException
+#          - java.io.IOException
+#          - org.springframework.web.client.ResourceAccessException
+
+
